@@ -6,5 +6,5 @@ only change a little things by hand:
 * Little adjust the margin between of the buttons
 
 ## play it
-* For latest browser(Bootstrap 5.x):
-* For old browser(Bootstrap 2.x):
+* For latest browser(Bootstrap 5.x):[https://bob-yspan.github.io/tictactoe-ai-gen/index.html](https://bob-yspan.github.io/tictactoe-ai-gen/index.html)
+* For old browser(Bootstrap 2.x):[https://bob-yspan.github.io/tictactoe-ai-gen/index_old.html](https://bob-yspan.github.io/tictactoe-ai-gen/index_old.html)
