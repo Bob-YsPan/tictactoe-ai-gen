@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Tic Tac Toe</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .btn-tic-tac-toe {
+      width: 100px;
+      height: 100px;
+      font-size: 36px;
+      margin: 10px;
+    }
+    .container {
+      text-align: center;
+      margin-top: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tic Tac Toe</h1>
+    <div>
+      <button id="btn-1" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(1)"></button>
+      <button id="btn-2" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(2)"></button>
+      <button id="btn-3" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(3)"></button>
+    </div>
+    <div>
+      <button id="btn-4" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(4)"></button>
+      <button id="btn-5" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(5)"></button>
+      <button id="btn-6" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(6)"></button>
+    </div>
+    <div>
+      <button id="btn-7" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(7)"></button>
+      <button id="btn-8" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(8)"></button>
+      <button id="btn-9" class="btn btn-tic-tac-toe btn-secondary" onclick="playMove(9)"></button>
+    </div>
+    <div class="btn-group">
+      <button type="button" class="btn btn-outline-primary" onclick="setGameMode('2')">2-player</button>
+      <button type="button" class="btn btn-primary" onclick="setGameMode('1')">1-player</button>
+    </div>
+  </div>
+
+  <script>
+    var currentPlayer = 'O';
+    var moves = ['', '', '', '', '', '', '', '', ''];
+    var gameMode = '1'; // Default: 1-player mode
+
+    function playMove(index) {
+      if (moves[index - 1] === '' && !checkWinner() && !isDraw()) {
+        moves[index - 1] = currentPlayer;
+        document.getElementById('btn-' + index).innerText = currentPlayer;
+
+        if (checkWinner()) {
+          return;
+        }
+
+        if (isDraw()) {
+          setTimeout(function() {
+            alert('It\'s a draw!');
+            resetGame();
+          }, 100);
+          return;
+        }
+
+        switchPlayer();
+
+        if (gameMode === '1' && currentPlayer === 'X') {
+          // If it's 1-player mode and it's the computer's turn
+          playComputerMove();
+        }
+      }
+    }
+
+    function checkWinner() {
+      var winningCombos = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6] // Diagonals
+      ];
+
+      for (var i = 0; i < winningCombos.length; i++) {
+        var combo = winningCombos[i];
+        var a = combo[0];
+        var b = combo[1];
+        var c = combo[2];
+        if (moves[a] !== '' && moves[a] === moves[b] && moves[a] === moves[c]) {
+          highlightWinningCombo(combo);
+          setTimeout(function() {
+            alert(moves[a] + ' wins!');
+            resetGame();
+          }, 100);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function isDraw() {
+      return !moves.includes('');
+    }
+
+    function switchPlayer() {
+      currentPlayer = currentPlayer === 'O' ? 'X' : 'O';
+    }
+
+    function resetGame() {
+      currentPlayer = 'O';
+      moves = ['', '', '', '', '', '', '', '', ''];
+      var buttons = document.getElementsByClassName('btn-tic-tac-toe');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].innerText = '';
+        buttons[i].classList.remove('btn-primary');
+        buttons[i].classList.remove('btn-danger');
+        buttons[i].classList.add('btn-secondary');
+      }
+      var modeButtons = document.getElementsByClassName('btn-group')[0].getElementsByTagName('button');
+      for (var j = 0; j < modeButtons.length; j++) {
+        modeButtons[j].classList.remove('btn-primary');
+        modeButtons[j].classList.remove('btn-outline-primary');
+        if (modeButtons[j].getAttribute('onclick').indexOf(gameMode) !== -1) {
+          modeButtons[j].classList.add('btn-primary');
+        } else {
+          modeButtons[j].classList.add('btn-outline-primary');
+        }
+      }
+    }
+
+    function highlightWinningCombo(combo) {
+      for (var i = 0; i < combo.length; i++) {
+        var index = combo[i];
+        var btn = document.getElementById('btn-' + (index + 1));
+        btn.classList.remove('btn-secondary');
+        if (moves[index] === 'X') {
+          btn.classList.add('btn-danger');
+        } else {
+          btn.classList.add('btn-primary');
+        }
+      }
+    }
+
+    function setGameMode(mode) {
+      gameMode = mode;
+      resetGame();
+    }
+
+    function playComputerMove() {
+      // AI algorithm for single-player mode
+      var availableMoves = [];
+      for (var i = 0; i < moves.length; i++) {
+        if (moves[i] === '') {
+          availableMoves.push(i);
+        }
+      }
+
+      // Check if the computer can win
+      for (var j = 0; j < availableMoves.length; j++) {
+        var testMoves = moves.slice();
+        testMoves[availableMoves[j]] = 'X';
+        if (checkWinnerForPlayer(testMoves, 'X')) {
+          playMove(availableMoves[j] + 1);
+          return;
+        }
+      }
+
+      // Check if the player can win and block
+      for (var k = 0; k < availableMoves.length; k++) {
+        var testMoves = moves.slice();
+        testMoves[availableMoves[k]] = 'O';
+        if (checkWinnerForPlayer(testMoves, 'O')) {
+          playMove(availableMoves[k] + 1);
+          return;
+        }
+      }
+
+      // If no winning moves, play random move
+      var randomIndex = Math.floor(Math.random() * availableMoves.length);
+      playMove(availableMoves[randomIndex] + 1);
+    }
+
+    function checkWinnerForPlayer(moves, player) {
+      var winningCombos = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6] // Diagonals
+      ];
+
+      for (var i = 0; i < winningCombos.length; i++) {
+        var combo = winningCombos[i];
+        var a = combo[0];
+        var b = combo[1];
+        var c = combo[2];
+        if (moves[a] !== '' && moves[a] === moves[b] && moves[a] === moves[c] && moves[a] === player) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  </script>
+</body>
+</html>
